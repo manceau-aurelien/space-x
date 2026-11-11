@@ -290,7 +290,8 @@ const Game = (() => {
       sector: msg.sector, startSector: msg.sector, t: 0, time: 0, dur: 60,
       kills: 0, units: 0, cores: 0, bossesKilled: 0, combo: 0, bestCombo: 0, over: false,
     };
-    if (S.best < msg.sector) S.best = msg.sector;
+    // L'hôte peut faire partir l'invité plus loin que son record : le record affiché suit aussi.
+    noteSectorReached(msg.sector);
     S.runs++;
     Music.flight(msg.sector);
     UI.banner('SECTEUR ' + msg.sector, 'Tous les ennemis convergent vers vous');
@@ -1568,7 +1569,8 @@ const Game = (() => {
       let dead = b.life <= 0;
       if (!dead) {
         if (st.homing && !b.shard && !b.drone) {
-          if (!b.target || b.target.dead) b.target = b.target && nearest(b.x, b.y, 80);
+          // Un obus parti sans cible (tourelle arrière, canons latéraux, tir renvoyé) en cherche une aussi.
+          if (!b.target || b.target.dead) b.target = nearest(b.x, b.y, 80);
           if (b.target && !b.target.dead) {
             const want = Math.atan2(b.target.y - b.y, b.target.x - b.x);
             const cur = Math.atan2(b.vy, b.vx);
